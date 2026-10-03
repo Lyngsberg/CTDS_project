@@ -10,7 +10,8 @@ exploring 2026-08 that motivate the rules:
 * Coordinates are the station's own coordinates, even for e-bikes, so the
   station table can take the modal coordinate per station.
 * Jersey City/Hoboken stations (JC*, HB*) show up on cross-Hudson rides, and
-  operator stations (SYS*, 'Shop Morgan') on maintenance moves. Both are dropped.
+  operator stations (SYS*, 'Shop Morgan', and 'Morgan HCT Charging', which hides
+  behind the numeric id '1234.56') on maintenance moves. Both are dropped.
 * The source already removes trips under 60 s. Zip files are split by *end*
   time, so trips are assigned to the study window by `started_at`.
 * Round trips (same start and end station) are kept but flagged: they cancel
@@ -41,6 +42,8 @@ from citibike.paths import PARQUET, PROCESSED
 MIN_DURATION_S = 60
 MAX_DURATION_S = 3 * 3600  # longer trips are mostly bikes not docked properly
 MAX_SPEED_KMH = 35  # e-bikes are capped at 20 mph (32 km/h)
+# Operator facilities that use normal-looking numeric ids (e.g. '1234.56' = 'Morgan HCT Charging')
+OPERATOR_NAMES = "(?i)charging|depot|warehouse|loading dock|mechanic"
 
 
 def canonical_id(col: str) -> str:
@@ -117,7 +120,9 @@ def clean_month(src: Path, start: str, end: str, con: duckdb.DuckDBPyConnection)
                 WHEN started_at < TIMESTAMP '{start}' OR started_at >= TIMESTAMP '{end}' THEN 'outside study window'
                 WHEN start_id IS NULL OR end_id IS NULL THEN 'missing station'
                 WHEN NOT regexp_matches(start_id, '^\\d+\\.\\d{{2}}$')
-                  OR NOT regexp_matches(end_id, '^\\d+\\.\\d{{2}}$') THEN 'non-NYC or operator station'
+                  OR NOT regexp_matches(end_id, '^\\d+\\.\\d{{2}}$')
+                  OR regexp_matches(start_station_name, '{OPERATOR_NAMES}')
+                  OR regexp_matches(end_station_name, '{OPERATOR_NAMES}') THEN 'non-NYC or operator station'
                 WHEN duration_s < 0 THEN 'negative duration (DST)'
                 WHEN duration_s < {MIN_DURATION_S} THEN 'too short'
                 WHEN duration_s > {MAX_DURATION_S} THEN 'too long'

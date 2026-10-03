@@ -1,0 +1,18 @@
+# systemd *user* service for the live GBFS collector.
+# Install:  ln -s "$PWD/deploy/citibike-gbfs.service" ~/.config/systemd/user/
+#           systemctl --user daemon-reload && systemctl --user enable --now citibike-gbfs
+#           loginctl enable-linger "$USER"     # keep running without an open terminal
+# Logs:     journalctl --user -u citibike-gbfs -f
+[Unit]
+Description=Citi Bike GBFS station_status collector (02807 project)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/home/lyngsberg/DTU/CTDS/project
+ExecStart=/home/lyngsberg/DTU/CTDS/project/.venv/bin/python -u -m citibike.gbfs collect
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

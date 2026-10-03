@@ -7,6 +7,7 @@ DATA = PROJECT / "data"
 RAW = DATA / "raw"  # zips exactly as downloaded from S3
 PARQUET = DATA / "parquet"  # typed, uncleaned trips: trips/month=YYYYMM/*.parquet
 PROCESSED = DATA / "processed"  # cleaned trips, station table, graphs, profiles
+FIGURES = PROJECT / "figures"  # report figures (small, tracked in git)
 
 S3_BUCKET = "https://s3.amazonaws.com/tripdata"
 
