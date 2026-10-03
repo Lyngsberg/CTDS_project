@@ -1,0 +1,9 @@
+[project]
+name = "citibike"
+version = "0.1.0"
+description = "02807 project: functional neighbourhoods from NYC Citi Bike trip flows"
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

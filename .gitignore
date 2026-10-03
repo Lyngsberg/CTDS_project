@@ -1,0 +1,17 @@
+# Data: large, rebuilt by the scripts in src/citibike
+data/
+
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info/
+.venv/
+.ipynb_checkpoints/
+
+# LaTeX build output
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
